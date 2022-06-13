@@ -1,2 +1,2 @@
 # victorborzaquel.github.io
-Currículo do Victor Borzaquel
+Portfólio do Victor Borzaquel
