@@ -168,8 +168,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
 .field:hover { background: var(--surface-2); }
 
 .field:nth-child(even) { border-right: none; }
-.field:nth-last-child(-n+2) { border-bottom: none; }
-.field:nth-last-child(1):nth-child(odd) { border-right: none; border-bottom: none; grid-column: span 2; }
+.field:nth-last-child(1) { border-bottom: none; }
+.field:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+.field:nth-last-child(1):nth-child(odd) { border-right: none; grid-column: span 2; }
 
 .field-left { min-width: 0; flex: 1; }
 
