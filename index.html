@@ -11,7 +11,8 @@
 <header>
   <div class="logo">dev<span>tools</span></div>
   <nav>
-    <button class="nav-link active" onclick="showPage('faker', this)">Person Faker</button>
+    <button class="nav-link active" data-page="faker" onclick="showPage('faker', this)">Person Faker</button>
+    <button class="nav-link" data-page="upsell-manager" onclick="showPage('upsell-manager', this)">Upsell Manager</button>
   </nav>
 </header>
 
@@ -56,14 +57,128 @@
       <div class="card-header">
         <span class="card-title">Dados Bancários</span>
         <div style="display:flex;align-items:center;gap:8px;">
-          <select class="bank-select" id="bank-scenario" onchange="renderBankFromSelect()"></select>
-          <span class="bank-badge">
+          <select class="select select-sm" id="bank-scenario" onchange="renderBankFromSelect()"></select>
+          <span class="badge badge-stripe">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M20.47 2H3.53a1.45 1.45 0 0 0-1.45 1.45v16.1a1.45 1.45 0 0 0 1.45 1.45h16.94a1.45 1.45 0 0 0 1.45-1.45V3.45A1.45 1.45 0 0 0 20.47 2zm-4.5 3.5h2.5v2.5h-2.5zm-4 0h2.5v2.5h-2.5zm-4 0H10v2.5H7.97zm10.53 12H5.5v-7h13zm0-9.5H15.5v-2.5h3v2.5z"/></svg>
             Stripe Test Data
           </span>
         </div>
       </div>
       <div class="fields" id="bank-fields"></div>
+    </div>
+  </div>
+
+  <!-- ── Upsell Manager ─────────────────────────────────── -->
+  <div class="page" id="page-upsell-manager">
+    <div class="page-header">
+      <div class="page-title">Upsell Manager</div>
+      <div class="page-desc">Gerencia snippets de upsell e permite visualizar o preview do widget por produto.</div>
+    </div>
+
+    <div class="meta-bar">
+      <span class="meta-bar-title" id="um-top-title" style="display:none"></span>
+      <span class="meta-bar-id" id="um-top-id">Nenhum ID selecionado</span>
+    </div>
+
+    <div class="split-layout">
+      <div class="split-side">
+
+        <!-- Ações -->
+        <div class="row row-wrap">
+          <button class="btn btn-ghost btn-block" onclick="exportGroup()">↓ Exportar produto</button>
+          <button class="btn btn-ghost btn-block" onclick="exportAll()">↓ Exportar tudo</button>
+          <button class="btn btn-ghost btn-block" onclick="document.getElementById('um-import-file').click()">↑ Importar</button>
+          <input type="file" id="um-import-file" accept=".json" style="display:none" onchange="importGroups(event)">
+        </div>
+
+        <!-- Ambiente -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Ambiente</span>
+          </div>
+          <div style="padding:14px 20px;">
+            <select class="select" id="um-environment-select" onchange="onEnvironmentChange()">
+              <option value="production">Produção</option>
+              <option value="local">Local</option>
+              <option value="release">Release</option>
+              <option value="hml">Homologação</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Produto -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Produto</span>
+          </div>
+          <div style="padding:14px 20px; display:flex; flex-direction:column; gap:10px;">
+            <div class="row">
+              <select class="select" id="um-group-select" onchange="onGroupChange()"></select>
+              <button class="btn btn-ghost btn-sm" onclick="newGroup()">+ Novo</button>
+              <button class="btn btn-ghost btn-sm" onclick="renameGroup()" title="Renomear produto">✎</button>
+              <button class="btn-danger" onclick="deleteGroup()" title="Deletar produto">✕</button>
+            </div>
+            <div class="list-empty" id="um-group-empty" style="display:none; padding:6px 0;">Nenhum produto neste ambiente.</div>
+          </div>
+        </div>
+
+        <!-- Checkout do Produto -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Checkout</span>
+          </div>
+          <div style="padding:14px 20px;">
+            <div class="row">
+              <input class="input" type="url" id="um-product-url" placeholder="—" readonly />
+              <button class="btn btn-ghost btn-sm" onclick="editProductUrl()" id="um-btn-edit-url" title="Editar URL">✎</button>
+              <button class="btn btn-ghost btn-sm" id="um-btn-open-url" onclick="openProductUrl()" disabled>↗ Abrir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Colar template -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Criar Upsell</span>
+          </div>
+          <div style="padding:14px 20px;">
+            <div class="form-group">
+              <span class="form-label">Título <span class="form-required">*</span></span>
+              <input class="input" type="text" id="um-template-title" placeholder="Ex: Checkout principal - produto X" />
+            </div>
+            <div class="form-group">
+              <span class="form-label">Snippet HTML <span class="form-required">*</span></span>
+              <textarea class="textarea" id="um-template-input" placeholder="Cole o snippet aqui..."></textarea>
+              <div class="badge-success" id="um-extracted-badge" style="display:none; margin-top:6px;">✓ <span id="um-extracted-id"></span></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-primary" onclick="extractFromTemplate()">Extrair e salvar</button>
+              <button class="btn btn-ghost" onclick="clearTemplate()">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Upsells salvos</span>
+          </div>
+          <div style="padding:14px 20px;" id="um-id-list"></div>
+        </div>
+
+      </div>
+
+      <!-- Preview -->
+      <div class="split-main panel">
+        <div class="panel-empty" id="um-preview-empty">
+          <div class="panel-empty-icon">↖</div>
+          <p>Selecione um upsell na lista para visualizar o widget</p>
+        </div>
+        <div id="um-widget-wrap" style="display:none; width:100%;">
+          <div class="panel-label" id="um-preview-label"></div>
+          <div id="vendepay-upsell-container"></div>
+        </div>
+      </div>
     </div>
   </div>
 </main>

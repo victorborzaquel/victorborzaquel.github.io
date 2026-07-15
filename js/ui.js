@@ -48,5 +48,9 @@ export function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   document.getElementById(`page-${id}`)?.classList.add('active');
-  btn.classList.add('active');
+  const target = btn ?? document.querySelector(`.nav-link[data-page="${id}"]`);
+  target?.classList.add('active');
+  if (location.hash !== `#${id}`) {
+    history.replaceState(null, '', location.pathname + location.search + `#${id}`);
+  }
 }
