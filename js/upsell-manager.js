@@ -453,11 +453,11 @@ function importGroups(event) {
 
 /* ── copy url ── */
 function copyUpsellUrl(id) {
-  const base = location.href.split('?')[0];
+  const base = location.href.split(/[?#]/)[0];
   const aid  = getGroupId();
   const params = new URLSearchParams({ groupId: aid, upsellId: id });
   applyEnvironmentParams(params, getEnvironment());
-  const url = `${base}?${params.toString()}`;
+  const url = `${base}?${params.toString()}#upsell-manager`;
 
   const markCopied = () => {
     const btn = document.getElementById(`um-copy-${id}`);
