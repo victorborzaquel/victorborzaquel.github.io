@@ -41,7 +41,7 @@ export function genSSN() {
 }
 
 export function genZIP() {
-  return rpad(rand(10000, 99999), 5);
+  return pick(localeData.us.zipCodes);
 }
 
 export function genPhoneUS() {

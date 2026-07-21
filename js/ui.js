@@ -6,12 +6,15 @@ const ICON_CHECK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" 
 export function renderFields(containerId, fields) {
   const el = document.getElementById(containerId);
   el.innerHTML = fields.map((f, i) => `
-    <div class="field">
+    <div class="field" role="button" tabindex="0"
+         onclick="copyField('val-${containerId}-${i}', this.querySelector('.copy-btn'))"
+         onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }"
+         title="Clique para copiar">
       <div class="field-left">
         <div class="field-label">${f.label}</div>
         <div class="field-value" id="val-${containerId}-${i}" title="${f.value}">${f.value}</div>
       </div>
-      <button class="copy-btn" onclick="copyField('val-${containerId}-${i}', this)" title="Copiar">
+      <button class="copy-btn" onclick="event.stopPropagation(); copyField('val-${containerId}-${i}', this)" title="Copiar" tabindex="-1">
         ${ICON_COPY}
       </button>
     </div>

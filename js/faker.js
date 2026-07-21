@@ -40,6 +40,7 @@ export function generate() {
   const first = pick(isFemale ? d.firstNamesFemale : d.firstNamesMale);
   const last  = pick(d.lastNames);
   const email = genEmail(first, last, loc);
+  const usLocation = loc === 'us' ? genZIP() : null;
 
   state.currentData.personal = loc === 'br'
     ? [
@@ -57,7 +58,8 @@ export function generate() {
         { label: 'Full name',  value: `${first} ${last}` },
         { label: 'Email',      value: email },
         { label: 'SSN',        value: genSSN() },
-        { label: 'ZIP code',   value: genZIP() },
+        { label: 'ZIP code',   value: usLocation.zipCode },
+        { label: 'State',      value: usLocation.state },
         { label: 'Phone',      value: genPhoneUS() },
       ];
 

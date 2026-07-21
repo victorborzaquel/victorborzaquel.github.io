@@ -163,9 +163,11 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
   justify-content: space-between;
   gap: 12px;
   transition: background 0.1s;
+  cursor: pointer;
 }
 
 .field:hover { background: var(--surface-2); }
+.field:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .field:nth-child(even) { border-right: none; }
 .field:nth-last-child(1) { border-bottom: none; }

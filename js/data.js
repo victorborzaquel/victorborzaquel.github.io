@@ -11,7 +11,18 @@ export const localeData = {
     firstNamesFemale: ['Mary','Patricia','Jennifer','Linda','Barbara','Elizabeth','Susan','Jessica','Sarah','Karen','Lisa','Nancy','Betty','Margaret','Sandra','Ashley','Dorothy','Kimberly','Emily','Donna','Michelle','Carol','Amanda','Melissa','Deborah','Stephanie','Rebecca','Sharon','Laura','Cynthia'],
     lastNames: ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Gonzalez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Lee','Perez','Thompson','White','Harris','Sanchez','Clark','Ramirez','Lewis','Robinson'],
     emailDomains: ['gmail.com','yahoo.com','outlook.com','hotmail.com','icloud.com','protonmail.com'],
-    states: ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'],
+    zipCodes: [
+      { zipCode: '04662', state: 'ME' },
+      { zipCode: '14738', state: 'NY' },
+      { zipCode: '68023', state: 'NE' },
+      { zipCode: '17563', state: 'PA' },
+      { zipCode: '92704', state: 'CA' },
+      { zipCode: '48637', state: 'MI' },
+      { zipCode: '84003', state: 'UT' },
+      { zipCode: '28119', state: 'NC' },
+      { zipCode: '05488', state: 'VT' },
+      { zipCode: '30022', state: 'GA' },
+    ],
   },
 };
 
