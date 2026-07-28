@@ -130,8 +130,22 @@
           <div style="padding:14px 20px;">
             <div class="row">
               <input class="input" type="url" id="um-product-url" placeholder="—" readonly />
-              <button class="btn btn-ghost btn-sm" onclick="editProductUrl()" id="um-btn-edit-url" title="Editar URL">✎</button>
-              <button class="btn btn-ghost btn-sm" id="um-btn-open-url" onclick="openProductUrl()" disabled>↗ Abrir</button>
+              <button class="btn btn-ghost btn-sm" onclick="editProductUrl('url')" id="um-btn-edit-url" title="Editar URL">✎</button>
+              <button class="btn btn-ghost btn-sm" id="um-btn-open-url" onclick="openProductUrl('url')" disabled>↗ Abrir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recorrência do Produto -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recorrência</span>
+          </div>
+          <div style="padding:14px 20px;">
+            <div class="row">
+              <input class="input" type="url" id="um-product-recurrence-url" placeholder="—" readonly />
+              <button class="btn btn-ghost btn-sm" onclick="editProductUrl('recurrenceUrl')" title="Editar URL">✎</button>
+              <button class="btn btn-ghost btn-sm" id="um-btn-open-recurrence-url" onclick="openProductUrl('recurrenceUrl')" disabled>↗ Abrir</button>
             </div>
           </div>
         </div>

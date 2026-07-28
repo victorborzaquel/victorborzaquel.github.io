@@ -11,6 +11,16 @@ const SK_UPSELL_SEL  = 'vp_upsell_selected';
 const SK_ENV_SEL     = 'vp_environment_sel';
 const upsellKey = id => `vp_upsells_${id}`;
 const PRODUCT_LINK_FIELDS = new Set(['url', 'recurrenceUrl']);
+const PRODUCT_LINK_CONTROLS = {
+  url: {
+    inputId: 'um-product-url',
+    openButtonId: 'um-btn-open-url',
+  },
+  recurrenceUrl: {
+    inputId: 'um-product-recurrence-url',
+    openButtonId: 'um-btn-open-recurrence-url',
+  },
+};
 
 function loadGroups()    { return JSON.parse(localStorage.getItem(SK_GROUPS) || '[]'); }
 function saveGroups(a)   { localStorage.setItem(SK_GROUPS, JSON.stringify(a)); }
@@ -67,51 +77,56 @@ function extractWidgetSrc(text) {
 }
 
 /* ── product url ── */
-function saveProductUrl() {
+function saveProductUrl(field) {
+  const controls = PRODUCT_LINK_CONTROLS[field];
   const gid = getGroupId();
-  if (!gid) return;
-  const input  = document.getElementById('um-product-url');
+  if (!controls || !gid) return;
+  const input  = document.getElementById(controls.inputId);
   const url    = input.value.trim();
   const groups = loadGroups();
-  const group  = groups.find(g => g.id === gid);
-  if (!group) return;
-  group.url = url;
+  if (!setProductLink(groups, gid, field, url)) return;
   saveGroups(groups);
   input.readOnly = true;
-  document.getElementById('um-btn-open-url').disabled = !url;
+  document.getElementById(controls.openButtonId).disabled = !url;
 }
 
-function editProductUrl() {
-  const input = document.getElementById('um-product-url');
+function editProductUrl(field) {
+  const controls = PRODUCT_LINK_CONTROLS[field];
+  if (!controls) return;
+  const input = document.getElementById(controls.inputId);
   input.readOnly = false;
   input.focus();
   input.select();
-  input.onblur  = () => saveProductUrl();
-  input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); saveProductUrl(); } };
+  input.onblur  = () => saveProductUrl(field);
+  input.onkeydown = e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveProductUrl(field);
+    }
+  };
 }
 
-function openProductUrl() {
-  const url = document.getElementById('um-product-url').value.trim();
+function openProductUrl(field) {
+  const controls = PRODUCT_LINK_CONTROLS[field];
+  if (!controls) return;
+  const url = document.getElementById(controls.inputId).value.trim();
   if (!url) return;
-
-  try {
-    const targetUrl = new URL(url);
-    applyEnvironmentParams(targetUrl.searchParams, getEnvironment());
-    window.open(targetUrl.toString(), '_blank', 'noopener');
-  } catch {
-    window.open(url, '_blank', 'noopener');
-  }
+  window.open(buildEnvironmentUrl(url, getEnvironment()), '_blank', 'noopener');
 }
 
-function updateProductUrlField() {
+function updateProductUrlFields() {
   const gid    = getGroupId();
   const groups = loadGroups();
   const group  = groups.find(g => g.id === gid);
-  const url    = group?.url || '';
-  const input  = document.getElementById('um-product-url');
-  input.value    = url;
-  input.readOnly = true;
-  document.getElementById('um-btn-open-url').disabled = !url;
+
+  PRODUCT_LINK_FIELDS.forEach(field => {
+    const controls = PRODUCT_LINK_CONTROLS[field];
+    const url = getProductLink(group, field);
+    const input = document.getElementById(controls.inputId);
+    input.value = url;
+    input.readOnly = true;
+    document.getElementById(controls.openButtonId).disabled = !url;
+  });
 }
 
 /* ── environment (filtro global, não pertence a um produto específico) ── */
@@ -145,7 +160,7 @@ function onEnvironmentChange() {
   setSelected('');
   updateUrlParams();
   renderGroups();
-  updateProductUrlField();
+  updateProductUrlFields();
   renderList();
   renderTopbar();
   loadWidget('');
@@ -156,7 +171,13 @@ function newGroup() {
   const name = prompt('Nome do produto:');
   if (!name || !name.trim()) return;
   const groups = loadGroups();
-  const group  = { id: uid(), name: name.trim(), url: '', environment: getEnvironment() };
+  const group = {
+    id: uid(),
+    name: name.trim(),
+    url: '',
+    recurrenceUrl: '',
+    environment: getEnvironment(),
+  };
   groups.push(group);
   saveGroups(groups);
   setGroupId(group.id);
@@ -201,7 +222,7 @@ function onGroupChange() {
   setGroupId(sel.value);
   setSelected('');
   updateUrlParams();
-  updateProductUrlField();
+  updateProductUrlFields();
   renderList();
   renderTopbar();
   loadWidget('');
@@ -336,7 +357,7 @@ function renderGroups() {
   if (groups.length === 0) {
     sel.style.display   = 'none';
     empty.style.display = 'block';
-    updateProductUrlField();
+    updateProductUrlFields();
     return;
   }
 
@@ -345,7 +366,7 @@ function renderGroups() {
   sel.innerHTML = groups.map(g =>
     `<option value="${g.id}" ${g.id === curId ? 'selected' : ''}>${escHtml(g.name)}</option>`
   ).join('');
-  updateProductUrlField();
+  updateProductUrlFields();
 }
 
 function renderList() {
@@ -478,7 +499,13 @@ function importGroups(event) {
       data.groups.forEach(g => {
         if (!g.id || !g.name) return;
         if (!existing.find(eg => eg.id === g.id)) {
-          existing.push({ id: g.id, name: g.name });
+          existing.push({
+            id: g.id,
+            name: g.name,
+            environment: g.environment || 'production',
+            url: g.url || '',
+            recurrenceUrl: g.recurrenceUrl || '',
+          });
           added++;
         } else {
           merged++;
