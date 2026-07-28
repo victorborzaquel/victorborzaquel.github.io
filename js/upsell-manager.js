@@ -10,6 +10,7 @@ const SK_GROUP_SEL   = 'vp_account_sel';
 const SK_UPSELL_SEL  = 'vp_upsell_selected';
 const SK_ENV_SEL     = 'vp_environment_sel';
 const upsellKey = id => `vp_upsells_${id}`;
+const PRODUCT_LINK_FIELDS = new Set(['url', 'recurrenceUrl']);
 
 function loadGroups()    { return JSON.parse(localStorage.getItem(SK_GROUPS) || '[]'); }
 function saveGroups(a)   { localStorage.setItem(SK_GROUPS, JSON.stringify(a)); }
@@ -30,6 +31,19 @@ function getSelected()   { return localStorage.getItem(SK_UPSELL_SEL) || ''; }
 function setSelected(id) { localStorage.setItem(SK_UPSELL_SEL, id); }
 
 function uid() { return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36); }
+
+export function getProductLink(group, field) {
+  if (!PRODUCT_LINK_FIELDS.has(field)) return '';
+  return group?.[field] || '';
+}
+
+export function setProductLink(groups, groupId, field, value) {
+  if (!PRODUCT_LINK_FIELDS.has(field)) return false;
+  const group = groups.find(item => item.id === groupId);
+  if (!group) return false;
+  group[field] = value.trim();
+  return true;
+}
 
 function escHtml(str) {
   return String(str)
@@ -110,6 +124,16 @@ function applyEnvironmentParams(params, environment) {
 
   if (environment === 'hml') params.set('isHML', 'true');
   if (environment === 'release') params.set('isRelease', 'true');
+}
+
+export function buildEnvironmentUrl(rawUrl, environment) {
+  try {
+    const targetUrl = new URL(rawUrl);
+    applyEnvironmentParams(targetUrl.searchParams, environment);
+    return targetUrl.toString();
+  } catch {
+    return rawUrl;
+  }
 }
 
 function updateEnvironmentField() {
