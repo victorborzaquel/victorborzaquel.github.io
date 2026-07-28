@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildWidgetScriptUrl,
   buildVersionedWidgetUrl,
   getManifestUrl,
   resolveLatestWidgetSrc,
@@ -12,7 +13,7 @@ const savedSrc =
 test('deriva o manifest do diretório do bundle salvo', () => {
   assert.equal(
     getManifestUrl(savedSrc),
-    'https://storage.googleapis.com/vendepay-widgets-cdn-hml-public/upsell-widget/v1/manifest.json',
+    'https://storage.googleapis.com/storage/v1/b/vendepay-widgets-cdn-hml-public/o/upsell-widget%2Fv1%2Fmanifest.json?alt=media',
   );
 });
 
@@ -44,4 +45,20 @@ test('usa o src salvo quando o manifest falha', async () => {
   });
 
   assert.equal(resolved, savedSrc);
+});
+
+test('usa o src salvo quando latestVersion está ausente', async () => {
+  const resolved = await resolveLatestWidgetSrc({
+    savedSrc,
+    fetchManifest: async () => ({}),
+  });
+
+  assert.equal(resolved, savedSrc);
+});
+
+test('adiciona upsellId sem descartar parâmetros existentes', () => {
+  assert.equal(
+    buildWidgetScriptUrl(`${savedSrc}?channel=preview`, 'upsell-123'),
+    `${savedSrc}?channel=preview&upsellId=upsell-123`,
+  );
 });
