@@ -17,6 +17,17 @@ test('deriva o manifest do diretório do bundle salvo', () => {
   );
 });
 
+test('usa o endpoint CORS do bucket para o domínio de produção', () => {
+  for (const hostname of ['widget.vendepay.com', 'cdn.vendepay.com']) {
+    assert.equal(
+      getManifestUrl(
+        `https://${hostname}/upsell-widget/v1/vendepay-upsell-widget-1.0.16.js`,
+      ),
+      'https://storage.googleapis.com/storage/v1/b/vendepay-widgets-cdn-prod-public/o/upsell-widget%2Fv1%2Fmanifest.json?alt=media',
+    );
+  }
+});
+
 test('substitui somente a versão do bundle', () => {
   assert.equal(
     buildVersionedWidgetUrl(savedSrc, 'hml-e4da47f'),

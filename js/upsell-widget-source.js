@@ -1,3 +1,20 @@
+const PROD_WIDGET_HOSTS = new Set([
+  'widget.vendepay.com',
+  'cdn.vendepay.com',
+]);
+
+function buildGcsManifestUrl(bucket, sourcePathname) {
+  const objectParts = sourcePathname.split('/').filter(Boolean);
+  const objectDirectory = objectParts.slice(0, -1);
+  const manifestObject = [...objectDirectory, 'manifest.json'].join('/');
+  const manifestUrl = new URL(
+    `/storage/v1/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(manifestObject)}`,
+    'https://storage.googleapis.com',
+  );
+  manifestUrl.searchParams.set('alt', 'media');
+  return manifestUrl.toString();
+}
+
 export function getManifestUrl(savedSrc) {
   const source = new URL(savedSrc);
 
@@ -5,14 +22,14 @@ export function getManifestUrl(savedSrc) {
     const [bucket, ...objectParts] = source.pathname
       .split('/')
       .filter(Boolean);
-    const objectDirectory = objectParts.slice(0, -1);
-    const manifestObject = [...objectDirectory, 'manifest.json'].join('/');
-    const manifestUrl = new URL(
-      `/storage/v1/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(manifestObject)}`,
-      source.origin,
+    return buildGcsManifestUrl(bucket, `/${objectParts.join('/')}`);
+  }
+
+  if (PROD_WIDGET_HOSTS.has(source.hostname)) {
+    return buildGcsManifestUrl(
+      'vendepay-widgets-cdn-prod-public',
+      source.pathname,
     );
-    manifestUrl.searchParams.set('alt', 'media');
-    return manifestUrl.toString();
   }
 
   return new URL('manifest.json', savedSrc).toString();
