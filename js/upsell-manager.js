@@ -241,6 +241,10 @@ async function fetchManifest(url) {
   return response.json();
 }
 
+export function shouldShowUpsellPreview(id, entries) {
+  return Boolean(id && entries.find(entry => entry.id === id)?.src);
+}
+
 async function loadWidget(id) {
   const container = document.getElementById('vendepay-upsell-container');
   const wrap      = document.getElementById('um-widget-wrap');
@@ -250,26 +254,19 @@ async function loadWidget(id) {
   const old = document.getElementById('vp-widget-script');
   if (old) old.remove();
 
-  if (!id) {
+  const requestedId = id;
+  const list = loadList();
+  const entry = list.find(e => e.id === id);
+  const savedSrc = entry?.src || '';
+
+  if (!shouldShowUpsellPreview(id, list)) {
     wrap.style.display  = 'none';
     empty.style.display = 'block';
     return;
   }
 
-  const requestedId = id;
-  const entry = loadList().find(e => e.id === id);
-  const savedSrc = entry?.src || '';
-
   wrap.style.display  = 'block';
   empty.style.display = 'none';
-
-  if (!savedSrc) {
-    container.innerHTML = `<div style="color:#fca5a5;font-size:13px;padding:16px;background:#1e2130;border:1px solid #ef444455;border-radius:8px">
-      Este upsell foi salvo sem o src do widget.<br>
-      <strong>Remova e re-cadastre colando o snippet HTML novamente.</strong>
-    </div>`;
-    return;
-  }
 
   const resolvedSrc = await resolveLatestWidgetSrc({
     savedSrc,
