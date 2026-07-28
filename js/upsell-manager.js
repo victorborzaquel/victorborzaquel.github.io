@@ -1,5 +1,10 @@
 /* ── Upsell Manager: módulo isolado, com estado e storage próprios (vp_*) ── */
 
+import {
+  buildWidgetScriptUrl,
+  resolveLatestWidgetSrc,
+} from './upsell-widget-source.js';
+
 const SK_GROUPS      = 'vp_accounts';
 const SK_GROUP_SEL   = 'vp_account_sel';
 const SK_UPSELL_SEL  = 'vp_upsell_selected';
@@ -228,7 +233,15 @@ function selectId(id) {
 }
 
 /* ── widget ── */
-function loadWidget(id) {
+async function fetchManifest(url) {
+  const response = await fetch(url, { cache: 'no-cache' });
+  if (!response.ok) {
+    throw new Error(`Manifest respondeu HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+async function loadWidget(id) {
   const container = document.getElementById('vendepay-upsell-container');
   const wrap      = document.getElementById('um-widget-wrap');
   const empty     = document.getElementById('um-preview-empty');
@@ -243,13 +256,14 @@ function loadWidget(id) {
     return;
   }
 
+  const requestedId = id;
   const entry = loadList().find(e => e.id === id);
-  const base  = entry?.src || '';
+  const savedSrc = entry?.src || '';
 
   wrap.style.display  = 'block';
   empty.style.display = 'none';
 
-  if (!base) {
+  if (!savedSrc) {
     container.innerHTML = `<div style="color:#fca5a5;font-size:13px;padding:16px;background:#1e2130;border:1px solid #ef444455;border-radius:8px">
       Este upsell foi salvo sem o src do widget.<br>
       <strong>Remova e re-cadastre colando o snippet HTML novamente.</strong>
@@ -257,12 +271,26 @@ function loadWidget(id) {
     return;
   }
 
+  const resolvedSrc = await resolveLatestWidgetSrc({
+    savedSrc,
+    fetchManifest,
+  });
+
+  if (getSelected() !== requestedId) return;
+
   const script  = document.createElement('script');
   script.id     = 'vp-widget-script';
-  script.src    = `${base}?upsellId=${id}`;
+  script.src    = buildWidgetScriptUrl(resolvedSrc, id);
   script.onload = () => {
     window.VendepayUpsellWidget &&
       window.VendepayUpsellWidget.showIframe('vendepay-upsell-container');
+  };
+  script.onerror = () => {
+    container.innerHTML = `
+      <div role="alert" style="color:#fca5a5;font-size:13px;padding:16px;background:#1e2130;border:1px solid #ef444455;border-radius:8px">
+        Não foi possível carregar o script do widget.
+      </div>
+    `;
   };
   document.body.appendChild(script);
 }
