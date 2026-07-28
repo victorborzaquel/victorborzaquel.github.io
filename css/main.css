@@ -74,6 +74,7 @@ nav {
 
 /* ── Layout ──────────────────────────────────────────────── */
 main { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+main:has(#page-upsell-manager.active) { max-width: 1200px; }
 
 .page { display: none; }
 .page.active { display: block; }
@@ -362,14 +363,191 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
   letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 16px; align-self: flex-start;
 }
 
+/* ── Upsell checkout preview ─────────────────────────────── */
+.upsell-preview-stage {
+  width: 100%;
+  background: #0f172a;
+  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 10px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.upsell-preview-checkout {
+  max-width: 520px;
+  width: 100%;
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 32px 24px 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.upsell-preview-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 0, #bbf7d0, #16a34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.upsell-preview-badge span {
+  color: #022c22;
+  font-size: 26px;
+}
+
+.upsell-preview-title {
+  color: #f9fafb;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.upsell-preview-subtitle {
+  color: #cbd5f5;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.upsell-preview-order {
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 16px 14px;
+  margin-bottom: 20px;
+}
+
+.upsell-preview-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.upsell-preview-order-title {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.upsell-preview-order-id {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.upsell-preview-order-row {
+  color: #d1d5db;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+}
+
+.upsell-preview-order-row span:last-child {
+  font-weight: 600;
+  text-align: right;
+}
+
+.upsell-preview-divider {
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.7), transparent);
+  margin: 10px 0 12px;
+}
+
+.upsell-preview-highlight {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.upsell-preview-highlight strong {
+  color: #e5e7eb;
+}
+
+.upsell-preview-offer {
+  margin-top: 22px;
+  padding: 16px 14px;
+  border-radius: 14px;
+  background: #020617;
+  border: 1px dashed rgba(74, 222, 128, 0.7);
+}
+
+.upsell-preview-offer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.upsell-preview-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.upsell-preview-offer-text {
+  color: #cbd5f5;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.upsell-preview-widget:empty {
+  min-height: 36px;
+  background: #020617;
+  border: 1px dashed rgba(148, 163, 184, 0.7);
+  border-radius: 10px;
+}
+
+.upsell-preview-footer {
+  color: #64748b;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  margin-top: 22px;
+  text-align: center;
+}
+
+.upsell-preview-footer strong {
+  color: #e5e7eb;
+}
+
 /* ── Split layout (side manager + main preview) ─────────── */
 .split-layout { display: flex; gap: 20px; align-items: flex-start; }
 .split-side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
-.split-main { flex: 1; min-width: 0; }
+.split-main { flex: 1; min-width: 0; justify-content: flex-start; }
 
 @media (max-width: 700px) {
   .split-layout { flex-direction: column; }
   .split-side { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .upsell-preview-stage { padding: 12px; }
+  .upsell-preview-checkout { padding: 24px 18px 22px; }
+  .upsell-preview-title { font-size: 1.45rem; }
+  .upsell-preview-subtitle { font-size: 0.9rem; }
+  .upsell-preview-order-row { align-items: flex-start; }
 }
 
 /* ── Inline meta bar (id/status info under page header) ── */
